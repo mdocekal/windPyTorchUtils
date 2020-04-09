@@ -1,2 +1,2 @@
-# windPyTorch
+# windPyTorchUtils
 Utils for PyTorch projects. 
