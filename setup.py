@@ -21,7 +21,8 @@ setup_args = dict(
     keywords=['utils', 'PyTorch', 'PyTorch utils' 'general usage'],
     url='https://github.com/windionleaf/windPyTorchUtils',
     install_requires=[
-        'torch>=1.3.1'
+        'torch>=1.3.1',
+        'scipy>=1.4.1',
     ]
 )
 
