@@ -5,6 +5,8 @@ Module with PyTorch samplers.
 
 :author:     Martin Dočekal
 """
+import math
+
 import torch
 from torch.utils.data import Sampler, Dataset
 
@@ -104,23 +106,28 @@ class SlidingBatchSampler(Sampler):
             yield batch
 
     def __len__(self):
-        # Derivation of formula:
-        # We are finding number of slide window steps when the window end would reach the end of data set of length L (len(self.sampler)).
-        #   window_end(step) = L
-        #
-        #   window_end(step) is function that returns offset of window end on given step (for now step can be non integer number)
-        #       window_end(step) = (step - 1)*stride + batchSize
-        #
-        #   (step - 1)*stride + batchSize = L
-        #                      (step - 1) = (L - batchSize) / stride
-        #                            step = 1 + (L - batchSize) / stride
-        #
-        #   The step is almost result of out __len__ method, but we need integer. So we will use ceil or floor
-        #   depending on the drop_last.
-
-        step = 1 + (len(self.sampler) - self.batchSize) / self.stride
-
-        if self.dropLast:
-            return int(step)
+        if len(self.sampler) == 0:
+            return 0
+        elif len(self.sampler) < self.batchSize:
+            return 0 if self.dropLast else 1
         else:
-            return int(step + 1)
+            # Derivation of formula:
+            # We are finding number of slide window steps when the window end would reach the end of data set of length L (len(self.sampler)).
+            #   window_end(step) = L
+            #
+            #   window_end(step) is function that returns offset of window end on given step (for now step can be non integer number)
+            #       window_end(step) = (step - 1)*stride + batchSize
+            #
+            #   (step - 1)*stride + batchSize = L
+            #                      (step - 1) = (L - batchSize) / stride
+            #                            step = 1 + (L - batchSize) / stride
+            #
+            #   The step is almost result of out __len__ method, but we need positive integer. So we will use ceil or floor
+            #   depending on the drop_last and also the min to get positive number.
+
+            step = 1 + (len(self.sampler) - self.batchSize) / self.stride
+
+            if self.dropLast:
+                return math.floor(step)
+            else:
+                return math.ceil(step)

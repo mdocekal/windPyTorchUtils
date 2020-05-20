@@ -88,6 +88,17 @@ class TestSlidingBatchSampler(unittest.TestCase):
                                       True)
         self.assertEqual(len(sampler), 0)
 
+        lDataset = 1
+        batchSize = 3
+        stride = 1
+        sampler = SlidingBatchSampler(torch.utils.data.SequentialSampler(MackUpDataset(lDataset)), batchSize, stride,
+                                      False)
+        self.assertEqual(len(sampler), 1)
+
+        sampler = SlidingBatchSampler(torch.utils.data.SequentialSampler(MackUpDataset(lDataset)), batchSize, stride,
+                                      True)
+        self.assertEqual(len(sampler), 0)
+
     def test_sampling(self):
         """
         Test the SlidingBatchSampler.
@@ -116,6 +127,11 @@ class TestSlidingBatchSampler(unittest.TestCase):
 
         sampler = SlidingBatchSampler(torch.utils.data.SequentialSampler(MackUpDataset(lDataset)), 2, 3, False)
         self.assertListEqual([x for x in sampler], [])
+
+        lDataset = 1
+
+        sampler = SlidingBatchSampler(torch.utils.data.SequentialSampler(MackUpDataset(lDataset)), 2, 3, False)
+        self.assertListEqual([x for x in sampler], [[0]])
 
 
 if __name__ == '__main__':
