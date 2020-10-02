@@ -6,9 +6,64 @@ Module with PyTorch samplers.
 :author:     Martin Dočekal
 """
 import math
+from typing import List
 
 import torch
 from torch.utils.data import Sampler, Dataset
+
+
+class ResumableSampler(Sampler):
+    """
+    Random sampler that can be resumed.
+
+    :ivar actPerm: Actually used permutation (walk trough dataset) for actual iteration.
+    :vartype actPerm: Optional[List[int]]
+    """
+
+    def __init__(self, source: Dataset, shuffle: bool = False):
+        """
+        Initialization of resumable sampler.
+
+        :param source: The source dataset that should be used.
+        :type source: Dataset
+        :param shuffle: Determines whether the dataset should be iterated in random order.
+        :type shuffle: bool
+        """
+
+        self._source = source
+        self._shuffle = shuffle
+
+        self._resume = None
+
+        self.actPerm = None
+
+    def resume(self, perm: List[int], skip: int):
+        """
+        Next call of __iter__ resumes permutation and skips first skip samples from beginning of this
+        permutation. All the other future __iter__ calls will act normal.
+
+        :param perm: Permutation (walk trough dataset samples).
+        :type perm: List[int]
+        :param skip: Number of samples from beginning (according to order derived from loaded permutation) that should
+            be skipped.
+        :type skip: int
+        """
+
+        self._resume = (perm, skip)
+
+    def __iter__(self):
+        if self._resume is None:
+            self.actPerm = torch.randperm(len(self)).tolist() if self._shuffle else torch.arange(len(self)).tolist()
+        else:
+            # we want to restore saved permutation
+            self.actPerm = self._resume[0][self._resume[1]:]
+            self._resume = None
+
+        for idx in self.actPerm:
+            yield idx
+
+    def __len__(self):
+        return len(self._source)
 
 
 class IndicesSubsampler(Sampler):
