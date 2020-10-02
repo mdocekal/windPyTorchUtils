@@ -11,7 +11,7 @@ with open('README.md') as readme_file:
 
 setup_args = dict(
     name='windPyTorchUtils',
-    version='1.0.0',
+    version='1.0.1',
     description='Useful tools for PyTorch projects.',
     long_description_content_type="text/markdown",
     long_description=README,
