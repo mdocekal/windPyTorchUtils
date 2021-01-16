@@ -11,12 +11,12 @@ with open('README.md') as readme_file:
 
 setup_args = dict(
     name='windPyTorchUtils',
-    version='1.0.1',
+    version='1.0.2',
     description='Useful tools for PyTorch projects.',
     long_description_content_type="text/markdown",
     long_description=README,
     license='The Unlicense',
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     author='Martin Dočekal',
     keywords=['utils', 'PyTorch', 'PyTorch utils' 'general usage'],
     url='https://github.com/windionleaf/windPyTorchUtils',
